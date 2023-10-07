@@ -6,11 +6,10 @@
   "scripts": {
     "start": "node index.js"
   },
-  "author": "",
+  "author": "Ninja Solution",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.3.1",
-    "ethers": "^6.7.1",
-    "ripemd160": "^2.0.2"
+    "ethers": "^6.7.1"
   }
 }
