@@ -9,6 +9,7 @@
   "author": "Ninja Solution",
   "license": "ISC",
   "dependencies": {
+    "csv-parser": "^3.0.0",
     "dotenv": "^16.3.1",
     "ethers": "^6.7.1"
   }

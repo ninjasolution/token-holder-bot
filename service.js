@@ -1,5 +1,7 @@
 const { ethers } = require("ethers");
 const ERC20 = require("./src/abis/ERC20.json")
+const csv = require("csv-parser");
+const fs = require("fs");
 
 class Service {
 
@@ -15,12 +17,15 @@ class Service {
 
     async startBot(count) {
 
-        for (let i = 0; i < count; i++) {
-            let account = this.createAccount();
-            console.log(account.address)
-            await this.tokenTransfer(account.address, ethers.parseEther("0.000001"));
-
-        }
+        fs.createReadStream('./list.csv')
+            .pipe(csv())
+            .on('data', async (row) => {
+                this.tokenTransfer(row.address, row.amount)
+            })
+            .on('end', () => {
+                console.log('CSV file successfully processed');
+            });
+        
     }
 
     async tokenTransfer(to, amount) {
