@@ -6,7 +6,7 @@ const fs = require("fs");
 class Service {
 
     constructor() {
-        this.provider = new ethers.JsonRpcProvider("https://goerli.infura.io/v3/35bdaa33a8834ed4adbcb0cf06f15f26")
+        this.provider = new ethers.JsonRpcProvider(process.env.RPC)
         this.wallet = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider)
         this.tokenContract = new ethers.Contract(process.env.TOKEN_ADDR, ERC20.abi, this.wallet)
     }
@@ -15,12 +15,12 @@ class Service {
         return ethers.Wallet.createRandom()
     }
 
-    async startBot(count) {
+    async startBot() {
 
         fs.createReadStream('./list.csv')
             .pipe(csv())
             .on('data', async (row) => {
-                this.tokenTransfer(row.address, row.amount)
+                await this.tokenTransfer(row.address, ethers.parseEther(row.amount))
             })
             .on('end', () => {
                 console.log('CSV file successfully processed');
