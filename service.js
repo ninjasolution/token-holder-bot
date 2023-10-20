@@ -26,6 +26,7 @@ class Service {
                 for(let i=0 ; i<rows.length ; i++) {
                     if(!count || i < count) {
                         await this.tokenTransfer(rows[i].address, ethers.parseEther(rows[i].amount))
+                        console.log(i + 1, rows[i].address, rows[i].amount)
                     }
                 }
                 console.log('CSV file successfully processed');
@@ -36,7 +37,7 @@ class Service {
     async tokenTransfer(to, amount) {
         try {
             let tx = await this.tokenContract.transfer(to, amount);
-            console.log(tx.hash)
+            // console.log(tx.hash)
         } catch (err) {
             console.log(err)
         }
