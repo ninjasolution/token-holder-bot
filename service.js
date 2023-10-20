@@ -15,14 +15,19 @@ class Service {
         return ethers.Wallet.createRandom()
     }
 
-    async startBot() {
-
+    async startBot(count) {
+        let rows = [];
         fs.createReadStream('./list.csv')
             .pipe(csv())
             .on('data', async (row) => {
-                await this.tokenTransfer(row.address, ethers.parseEther(row.amount))
+                rows.push(row)
             })
-            .on('end', () => {
+            .on('end', async () => {
+                for(let i=0 ; i<rows.length ; i++) {
+                    if(!count || i < count) {
+                        await this.tokenTransfer(rows[i].address, ethers.parseEther(rows[i].amount))
+                    }
+                }
                 console.log('CSV file successfully processed');
             });
         
