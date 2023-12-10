@@ -78,7 +78,7 @@ class Service {
                 1,
                 [this.tokenAddr, this.weth9Addr],
                 this.wallet.address,
-                ethers.MaxUint256
+                ethers.MaxUint256,
                 {gasLimit: 6000000});
             console.log(tx.hash)
         } catch (err) {
