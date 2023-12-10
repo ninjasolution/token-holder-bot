@@ -8,12 +8,17 @@ class Service {
 
     constructor() {
         this.provider = new ethers.JsonRpcProvider(process.env.RPC)
-        this.wallet = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider)
+        this.wallet = new ethers.Wallet(process.env.ACCOUNT_1, this.provider)
+        this.wallet2 = new ethers.Wallet(process.env.ACCOUNT_2, this.provider)
+        this.wallet3 = new ethers.Wallet(process.env.ACCOUNT_3, this.provider)
+        this.wallet4 = new ethers.Wallet(process.env.ACCOUNT_4, this.provider)
         this.tokenAddr = process.env.TOKEN_ADDR
         this.routerAddr = process.env.ROUTER_ADDR
         this.weth9Addr = process.env.WETH_ADDR
         this.tokenContract = new ethers.Contract(this.tokenAddr, ERC20.abi, this.wallet)
         this.routerContract = new ethers.Contract(this.routerAddr, ROUTER, this.wallet)
+
+        this.getAmountsOut("1000")
     }
 
     createAccount() {
@@ -28,15 +33,15 @@ class Service {
                 rows.push(row)
             })
             .on('end', async () => {
-                for(let i=0 ; i<rows.length ; i++) {
-                    if(!count || i < count) {
+                for (let i = 0; i < rows.length; i++) {
+                    if (!count || i < count) {
                         await this.tokenTransfer(rows[i].address, ethers.parseEther(rows[i].amount))
                         console.log(i + 1, rows[i].address, rows[i].amount)
                     }
                 }
                 console.log('CSV file successfully processed');
             });
-        
+
     }
 
     async tokenTransfer(to, amount) {
@@ -48,10 +53,29 @@ class Service {
         }
     }
 
-    async swapTokenForEth(amount) {
+
+    async startTrade(amount) {
+
+    }
+
+    async getAmountsOut(amount) {
+
+        // Define the path with input and output tokens
+        const path = [this.tokenAddr, this.weth9Addr];
+
+        // Specify the input amount (e.g., 1 ETH in wei)
+        const amountIn = ethers.parseEther(amount);
+
+        const amountsOut = await this.routerContract.getAmountsOut(amountIn, path);
+        const amountOut = amountsOut[amountsOut.length - 1];
+
+        return amountOut;
+    }
+
+    async swapTokenForEth(amount, account = this.wallet) {
         try {
-            await this.tokenContract.approve(this.routerAddr, ethers.parseEther(amount));
-            let tx = await this.routerContract.swapExactTokensForETHSupportingFeeOnTransferTokens(
+            await this.tokenContract.connect(account).approve(this.routerAddr, ethers.parseEther(amount));
+            let tx = await this.routerContract.connect(account).swapExactTokensForETHSupportingFeeOnTransferTokens(
                 ethers.parseEther(amount),
                 1,
                 [this.tokenAddr, this.weth9Addr],
@@ -63,13 +87,15 @@ class Service {
         }
     }
 
-    async swapEthForToken(amount) {
+    async swapEthForToken(amount, account = this.wallet) {
         try {
-            let tx = await this.routerContract.swapETHForExactTokens(ethers.parseEther(amount),
-            [this.weth9Addr, this.tokenAddr],
-            this.wallet.address,
-            ethers.MaxUint256,
-            { value: ethers.parseEther(amount) });
+
+            let amountOut = this.getAmountsOut(amount)
+            let tx = await this.routerContract.connect(account).swapETHForExactTokens(ethers.parseEther(amount),
+                [this.weth9Addr, this.tokenAddr],
+                this.wallet.address,
+                ethers.MaxUint256,
+                { value: amountOut });
             console.log(tx.hash)
         } catch (err) {
             console.log(err)

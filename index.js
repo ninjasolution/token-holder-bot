@@ -24,7 +24,7 @@ if (process.argv && process.argv.length > 2) {
         case "sell":
             console.log("sell")
             for (let i = 0; i < count; i++) {
-                service.swapTokenForEth(amount);
+                service.swapTokenForEth(amount, service.wallet2);
             }
             break;
         default:
