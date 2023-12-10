@@ -17,7 +17,7 @@ if (process.argv && process.argv.length > 2) {
 
     commants.forEach(commant => {
 
-        let wallet = new ethers.Wallet(commant[1], service.provider)
+        let wallet = new ethers.Wallet(commant[1] || 0, service.provider)
 
         switch (commant[0]) {
             case "holder":
@@ -26,13 +26,13 @@ if (process.argv && process.argv.length > 2) {
             case "buy":
                 console.log("buy")
                 for (let i = 0; i < 2; i++) {
-                    service.swapEthForToken(commant[2], wallet);
+                    service.swapEthForToken(commant[2] || amount, wallet);
                 }
                 break;
             case "sell":
                 console.log("sell")
                 for (let i = 0; i < 1; i++) {
-                    service.swapTokenForEth(commant[2], wallet);
+                    service.swapTokenForEth(commant[2] || amount, wallet);
                 }
                 break;
             default:
