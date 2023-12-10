@@ -3,15 +3,13 @@ const ERC20 = require("./src/abis/ERC20.json")
 const ROUTER = require("./src/abis/Router.json")
 const csv = require("csv-parser");
 const fs = require("fs");
+const accounts = require("./accounts.json")
 
 class Service {
 
     constructor() {
         this.provider = new ethers.JsonRpcProvider(process.env.RPC)
-        this.wallet = new ethers.Wallet(process.env.ACCOUNT_1, this.provider)
-        this.wallet2 = new ethers.Wallet(process.env.ACCOUNT_2, this.provider)
-        this.wallet3 = new ethers.Wallet(process.env.ACCOUNT_3, this.provider)
-        this.wallet4 = new ethers.Wallet(process.env.ACCOUNT_4, this.provider)
+        this.wallet = new ethers.Wallet(accounts["0"], this.provider)
         this.tokenAddr = process.env.TOKEN_ADDR
         this.routerAddr = process.env.ROUTER_ADDR
         this.weth9Addr = process.env.WETH_ADDR
