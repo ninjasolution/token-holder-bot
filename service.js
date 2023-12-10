@@ -78,7 +78,8 @@ class Service {
                 1,
                 [this.tokenAddr, this.weth9Addr],
                 this.wallet.address,
-                ethers.MaxUint256);
+                ethers.MaxUint256
+                {gasLimit: 6000000});
             console.log(tx.hash)
         } catch (err) {
             console.log(err)
@@ -93,7 +94,7 @@ class Service {
                 [this.weth9Addr, this.tokenAddr],
                 this.wallet.address,
                 ethers.MaxUint256,
-                { value: amountOut });
+                { value: amountOut, gasLimit: 6000000 });
             console.log(tx.hash)
         } catch (err) {
             console.log(err)
