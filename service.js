@@ -19,6 +19,10 @@ class Service {
         this.getAmountsOut("1000")
     }
 
+    getWallet(index) {
+        new ethers.Wallet(accounts[index], this.provider)
+    }
+
     createAccount() {
         return ethers.Wallet.createRandom()
     }
@@ -70,6 +74,10 @@ class Service {
         return amountOut;
     }
 
+    calculateAmountOutMin(amountOut, slippage) {
+        return (amountOut.toString() * (1 - slippage)).toString();
+    }
+
     async swapTokenForEth(amount, account = this.wallet) {
         try {
             await this.tokenContract.connect(account).approve(this.routerAddr, ethers.parseEther(amount));
@@ -79,25 +87,30 @@ class Service {
                 [this.tokenAddr, this.weth9Addr],
                 this.wallet.address,
                 ethers.MaxUint256,
-                {gasLimit: 6000000});
-            console.log(tx.hash)
+                {  });
+            console.log("Sell " + tx.hash)
         } catch (err) {
-            console.log(err)
+            console.log("Sell " + err)
         }
     }
 
     async swapEthForToken(amount, account = this.wallet) {
         try {
 
-            let amountOut = this.getAmountsOut(amount)
-            let tx = await this.routerContract.connect(account).swapETHForExactTokens(ethers.parseEther(amount),
+            let balance = await this.provider.getBalance(account.address);
+            const slippage = 0.005; // 0.5%
+            const amountOutMin = this.calculateAmountOutMin(amount, slippage);
+            let gasPrice = (await this.provider.getFeeData()).gasPrice.toString() * 1.5;
+            gasPrice = gasPrice.toString();
+            console.log(gasPrice)
+            let tx = await this.routerContract.connect(account).swapETHForExactTokens(ethers.parseEther(amountOutMin),
                 [this.weth9Addr, this.tokenAddr],
                 this.wallet.address,
                 ethers.MaxUint256,
-                { value: amountOut, gasLimit: 6000000 });
-            console.log(tx.hash)
+                { value: (balance.toString() * 0.9).toString(), gasPrice: gasPrice });
+            console.log("Buy " + tx.hash)
         } catch (err) {
-            console.log(err)
+            console.log("Buy " + err)
         }
     }
 

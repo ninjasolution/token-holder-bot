@@ -6,7 +6,7 @@ var service = require("./service")
 
 if (process.argv && process.argv.length > 2) {
     let count = 1;
-    let amount = 0.01;
+    let amount = "0.01";
     
 
     let argments = process.argv.slice(2, process.argv.length);
@@ -15,9 +15,11 @@ if (process.argv && process.argv.length > 2) {
         commants.push([argments[i], argments[i+1], argments[i+2]])
     }
 
+    console.log(commants)
+
     commants.forEach(commant => {
 
-        let wallet = new ethers.Wallet(commant[1] || 0, service.provider)
+        let wallet = service.getWallet(commant[1] || "0")
 
         switch (commant[0]) {
             case "holder":
@@ -25,13 +27,13 @@ if (process.argv && process.argv.length > 2) {
                 break;
             case "buy":
                 console.log("buy")
-                for (let i = 0; i < 2; i++) {
+                for (let i = 0; i < count; i++) {
                     service.swapEthForToken(commant[2] || amount, wallet);
                 }
                 break;
             case "sell":
                 console.log("sell")
-                for (let i = 0; i < 1; i++) {
+                for (let i = 0; i < count; i++) {
                     service.swapTokenForEth(commant[2] || amount, wallet);
                 }
                 break;
