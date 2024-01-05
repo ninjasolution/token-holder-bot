@@ -98,7 +98,7 @@ class Service {
         try {
 
             let balance = await this.provider.getBalance(account.address);
-            const slippage = 0.005; // 0.5%
+            const slippage = 0.01; // 1%
             const amountOutMin = this.calculateAmountOutMin(amount, slippage);
             let gasPrice = (await this.provider.getFeeData()).gasPrice.toString() * 1.5;
             gasPrice = gasPrice.toString();
